@@ -1,411 +1,771 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RutinFlow Pro - Akıllı Alışkanlık & Hedef Yönetimi</title>
-  
-  <!-- Google Fonts: Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RutinFlow Pro</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <style>
-    /* Özel Kaydırma Çubuğu */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #090d16;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
-    
-    .glass-card {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(51, 65, 85, 0.55);
-    }
-    
-    .heat-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 3px;
-      transition: transform 0.15s ease, outline 0.15s ease;
-    }
-    .heat-cell:hover {
-      transform: scale(1.35);
-      z-index: 10;
-      outline: 2px solid #818cf8;
-    }
+    body { background-color: #0b0f19; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); }
+    .glass-card-hover:hover { border-color: rgba(99, 102, 241, 0.3); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
   </style>
 </head>
+<body class="min-h-screen pb-16">
 
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-indigo-500 selection:text-white pb-20">
-
-  <!-- Üst Menü -->
-  <header class="sticky top-0 z-30 glass-card border-b border-slate-800/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      
-      <!-- Logo & Tarih & Kalkan Durumu -->
-      <div class="flex items-center space-x-3.5">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-400/20">
-          <i class="fa-solid fa-fire text-amber-300 text-xl animate-pulse"></i>
+  <!-- Üst Bar -->
+  <header class="glass-card sticky top-0 z-40 border-b border-gray-800/80 px-4 py-3 mb-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+          <i class="fa-solid fa-bolt-lightning text-lg"></i>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-xl font-extrabold tracking-tight text-white">Rutin<span class="text-indigo-400">Flow</span></h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">PRO v2.0</span>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white tracking-wide">RutinFlow</h1>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">PRO</span>
           </div>
-          <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
-            <span id="currentDateDisplay">Yükleniyor...</span>
-            <span class="text-slate-600">•</span>
-            <span id="shieldHeaderStatus" class="text-amber-400 font-semibold flex items-center gap-1" title="Haftalık kullanılabilir seri kalkanı hakkı">
-              <i class="fa-solid fa-shield-halved"></i> 2/2 Kalkan
-            </span>
+          <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+            <span id="status-pill" class="text-emerald-400 font-medium">Hazır</span>
+            <span>•</span>
+            <span id="streak-freeze-badge" class="text-sky-400"><i class="fa-solid fa-snowflake text-[10px]"></i> 2/2 Kalkan</span>
           </div>
         </div>
       </div>
 
-      <!-- Aksiyon Butonları -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Pomodoro Hızlı Butonu -->
-        <button onclick="openPomodoroModal()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 hover:border-rose-500/60 transition-all flex items-center gap-2 text-xs font-semibold shadow-sm">
-          <i class="fa-solid fa-stopwatch animate-pulse"></i>
-          <span class="hidden md:inline">Odak Sayacı (Pomodoro)</span>
+      <div class="flex items-center gap-2">
+        <button onclick="window.openTimerModal()" class="px-3 py-1.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-gray-200 border border-gray-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-stopwatch text-indigo-400"></i>
+          <span class="hidden sm:inline">Odak</span> Sayacı
         </button>
-
-        <!-- Veri & Yedekleme Butonu -->
-        <button onclick="openDataModal()" title="Veri Yönetimi ve Yedekleme" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all flex items-center gap-1.5 text-xs font-medium">
-          <i class="fa-solid fa-sliders"></i>
+        <button onclick="window.openDataModal()" class="px-3 py-1.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-gray-200 border border-gray-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-database text-gray-400"></i>
           <span class="hidden sm:inline">Veri</span>
         </button>
-
-        <!-- Yeni Hedef Butonu -->
-        <button onclick="openHabitModal()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
-          <i class="fa-solid fa-plus text-xs"></i>
-          <span>Yeni Alışkanlık</span>
+        <button onclick="window.openAddModal()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-plus"></i>
+          <span>Yeni Hedef</span>
         </button>
       </div>
-
     </div>
   </header>
 
-  <!-- Ana İçerik -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+  <main class="max-w-6xl mx-auto px-4 space-y-6">
 
-    <!-- 1. İstatistik Özet Kartları -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- Kart 1: Bugünkü Tamamlama -->
-      <div class="glass-card rounded-2xl p-5 hover:border-slate-700/80 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Bugünkü Hedefler</span>
-          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-            <i class="fa-solid fa-calendar-check text-sm"></i>
-          </div>
+    <!-- İstatistik Kartları -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+          <span>Bugünkü Hedefler</span>
+          <i class="fa-solid fa-list-check text-indigo-400"></i>
         </div>
-        <div class="flex items-baseline justify-between mb-2">
-          <div class="text-2xl font-extrabold text-white" id="todayProgressText">0 / 0</div>
-          <span class="text-sm font-bold text-indigo-400" id="todayPercentBadge">%0</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-today-ratio" class="text-xl md:text-2xl font-bold text-white">0 / 0</span>
+          <span id="stat-today-pct" class="text-xs font-semibold text-indigo-400">%0</span>
         </div>
-        <div class="w-full bg-slate-800/90 h-2.5 rounded-full overflow-hidden">
-          <div id="todayProgressBar" class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-        <p class="text-[11px] text-slate-400 mt-2.5 flex items-center gap-1.5" id="todayStatusText">
-          <i class="fa-solid fa-clock text-slate-500"></i> Günlük hedefler seni bekliyor
-        </p>
+        <p class="text-[11px] text-gray-500 mt-1 truncate">Tamamlanan görevler</p>
       </div>
 
-      <!-- Kart 2: Aktif Seri Lideri -->
-      <div class="glass-card rounded-2xl p-5 hover:border-slate-700/80 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Seri Şampiyonu</span>
-          <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
-            <i class="fa-solid fa-fire text-sm"></i>
-          </div>
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+          <span>Aktif Seri</span>
+          <i class="fa-solid fa-fire text-amber-500"></i>
         </div>
-        <div class="flex items-baseline space-x-2 mb-1">
-          <div class="text-2xl font-extrabold text-amber-400" id="bestStreakCount">0 Gün</div>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-streak-val" class="text-xl md:text-2xl font-bold text-white">0 Gün</span>
+          <span class="text-xs font-semibold text-amber-500"><i class="fa-solid fa-bolt"></i></span>
         </div>
-        <div class="text-xs font-semibold text-slate-200 truncate" id="bestStreakHabitTitle">-</div>
-        <p class="text-[11px] text-slate-400 mt-2.5 flex items-center gap-1.5">
-          <i class="fa-solid fa-bolt text-amber-500"></i> Zincir kırılmadan devam ediyor
-        </p>
+        <p class="text-[11px] text-gray-500 mt-1 truncate">Zinciri kırmadan devam</p>
       </div>
 
-      <!-- Kart 3: Haftalık Verimlilik -->
-      <div class="glass-card rounded-2xl p-5 hover:border-slate-700/80 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Haftalık Skor</span>
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-            <i class="fa-solid fa-chart-pie text-sm"></i>
-          </div>
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+          <span>Haftalık Ortalama</span>
+          <i class="fa-solid fa-chart-line text-emerald-400"></i>
         </div>
-        <div class="flex items-baseline justify-between mb-2">
-          <div class="text-2xl font-extrabold text-emerald-400" id="weeklyScoreText">%0</div>
-          <span class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 font-semibold" id="weeklyGradeBadge">Başlangıç</span>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-weekly-avg" class="text-xl md:text-2xl font-bold text-white">%0</span>
+          <span class="text-xs text-emerald-400 font-medium">Son 7 Gün</span>
         </div>
-        <div class="w-full bg-slate-800/90 h-2.5 rounded-full overflow-hidden">
-          <div id="weeklyScoreBar" class="bg-gradient-to-r from-emerald-500 to-teal-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-        <p class="text-[11px] text-slate-400 mt-2.5 flex items-center gap-1.5">
-          <i class="fa-solid fa-bullseye text-emerald-500"></i> Son 7 günlük ortalama
-        </p>
+        <p class="text-[11px] text-gray-500 mt-1 truncate">Başarı oranı</p>
       </div>
 
-      <!-- Kart 4: Kalkan & Toplam Güç -->
-      <div class="glass-card rounded-2xl p-5 hover:border-slate-700/80 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Seri Kalkanı</span>
-          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-            <i class="fa-solid fa-shield-halved text-sm"></i>
-          </div>
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+          <span>Seri Kalkanı</span>
+          <i class="fa-solid fa-shield-halved text-sky-400"></i>
         </div>
-        <div class="flex items-baseline space-x-2 mb-1">
-          <div class="text-2xl font-extrabold text-cyan-400" id="shieldCountDisplay">2 / 2 Hak</div>
+        <div class="flex items-baseline justify-between">
+          <span id="stat-freeze-val" class="text-xl md:text-2xl font-bold text-white">2 / 2 Hak</span>
+          <span class="text-xs text-sky-400 font-medium">Korumalı</span>
         </div>
-        <div class="text-xs font-medium text-slate-300" id="shieldNoteText">
-          Bu hafta 0 kalkan harcandı
-        </div>
-        <p class="text-[11px] text-slate-400 mt-2.5 flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-info text-cyan-400"></i> Beklenmedik günleri seriyi bozmadan korur
-        </p>
+        <p class="text-[11px] text-gray-500 mt-1 truncate">Zincir koruma hakkı</p>
       </div>
+    </div>
 
-    </section>
-
-    <!-- 2. GitHub Tarzı 90 Günlük Isı Haritası (Contribution Heatmap) -->
-    <section class="glass-card rounded-2xl p-5 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-cubes-stacked text-indigo-400"></i>
-            90 Günlük Tutarlılık Isı Haritası
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Son 3 aydaki genel disiplin yoğunluğunuz</p>
+    <!-- 90 Günlük Isı Haritası -->
+    <div class="glass-card rounded-2xl p-4 md:p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-calendar-days text-indigo-400 text-sm"></i>
+          <h2 class="text-xs md:text-sm font-semibold text-white">90 Günlük Tutarlılık Isı Haritası</h2>
         </div>
-        <!-- Isı Lejantı -->
-        <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
           <span>Düşük</span>
-          <div class="w-3 h-3 rounded bg-slate-800"></div>
-          <div class="w-3 h-3 rounded bg-emerald-950 border border-emerald-800/40"></div>
-          <div class="w-3 h-3 rounded bg-emerald-800"></div>
-          <div class="w-3 h-3 rounded bg-emerald-600"></div>
-          <div class="w-3 h-3 rounded bg-emerald-400"></div>
+          <span class="w-2.5 h-2.5 rounded-sm bg-gray-800"></span>
+          <span class="w-2.5 h-2.5 rounded-sm bg-emerald-950"></span>
+          <span class="w-2.5 h-2.5 rounded-sm bg-emerald-700"></span>
+          <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span>
           <span>Yüksek</span>
         </div>
       </div>
-
-      <!-- Isı Hücreleri Konteyneri -->
-      <div class="overflow-x-auto pb-2 scrollbar-none">
-        <div id="heatmapContainer" class="flex gap-1.5 min-w-[700px]">
-          <!-- JS ile haftalık sütunlar ve 7 günlük kareler üretilecek -->
-        </div>
+      <div class="overflow-x-auto pb-2">
+        <div id="heatmapGrid" class="flex gap-1 min-w-[580px]"></div>
       </div>
-    </section>
+    </div>
 
-    <!-- 3. Ana Grid: Sol Alışkanlıklar & Sağ Analitik / Pomodoro -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- Sol Sütun (Alışkanlıklar Listesi & 7 Günlük Matris) - 7 Kolon -->
-      <div class="lg:col-span-7 space-y-6">
-        
-        <!-- Filtreler Barı -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>Alışkanlıklarım</span>
-              <span id="habitCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">0</span>
-            </h2>
-            <p class="text-xs text-slate-400">Günlük ilerlemeni kaydet, hedeflerini tamamla.</p>
-          </div>
-
-          <!-- Kategori Filtre Butonları -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none" id="categoryFilters">
-            <!-- Dinamik doldurulacak -->
-          </div>
-        </div>
-
-        <!-- 7 Günlük Tablo Başlığı (Masaüstü için) -->
-        <div class="hidden sm:flex items-center justify-between px-5 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-xs font-medium text-slate-400">
-          <div class="w-1/2">Alışkanlık & Hedef Durumu</div>
-          <div class="w-1/2 flex items-center justify-end gap-2 pr-2 text-center" id="calendarHeaderDays">
-            <!-- 7 Gün isimleri dinamik -->
-          </div>
-        </div>
-
-        <!-- Alışkanlık Kartları -->
-        <div id="habitsContainer" class="space-y-4">
-          <!-- Dinamik içerik buraya gelecek -->
-        </div>
-
-        <!-- Boş Durum -->
-        <div id="emptyState" class="hidden glass-card rounded-2xl p-10 text-center space-y-4 border border-dashed border-slate-700/80">
-          <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-2xl border border-indigo-500/20">
-            <i class="fa-solid fa-sparkles animate-pulse"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Henüz bir hedef veya alışkanlık eklemediniz</h3>
-            <p class="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto leading-relaxed">
-              Tertemiz bir başlangıç! İlk hedefinizi (klasik, sayısal sayaç veya odak seansı) tanımlayarak disiplin serinizi sıfırdan başlatın.
-            </p>
-          </div>
-          <button onclick="openHabitModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2">
-            <i class="fa-solid fa-plus text-xs"></i>
-            <span>+ İlk Hedefini Ekle</span>
-          </button>
-        </div>
-
+    <!-- Alışkanlıklar Listesi -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <span>Alışkanlıklarım</span>
+          <span id="habit-count-badge" class="px-2 py-0.5 rounded-full text-[11px] bg-gray-800 text-gray-300">0</span>
+        </h2>
+        <span class="text-xs text-gray-400">Son 7 Gün & Bugün</span>
       </div>
 
-      <!-- Sağ Sütun: Haftalık Grafik & "Neden Aksadı?" Analizi - 5 Kolon -->
-      <div class="lg:col-span-5 space-y-6">
-        
-        <!-- Haftalık Grafik Kartı -->
-        <div class="glass-card rounded-2xl p-5 sm:p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-chart-line text-indigo-400"></i>
-                Haftalık Tamamlama Eğrisi
-              </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Son 7 günün genel başarı yüzdesi</p>
-            </div>
-            <span class="text-[11px] font-medium px-2 py-1 rounded bg-slate-800 text-slate-300">
-              Son 7 Gün
-            </span>
-          </div>
+      <div id="habitsContainer" class="space-y-3"></div>
+    </div>
 
-          <!-- Chart.js Tuvali -->
-          <div class="relative h-56 w-full">
-            <canvas id="weeklyChart"></canvas>
-          </div>
+    <!-- Grafikler: Haftalık Eğri & Neden Aksadı -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="glass-card rounded-2xl p-4 md:p-5 md:col-span-2">
+        <h3 class="text-xs md:text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-chart-area text-indigo-400"></i>
+          <span>Haftalık Tamamlama Eğrisi</span>
+        </h3>
+        <div class="h-48 relative">
+          <canvas id="weeklyChart"></canvas>
         </div>
-
-        <!-- "Neden Aksadı?" Sürtünme Analizi Kartı -->
-        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-brain text-rose-400"></i>
-                "Neden Aksadı?" Analizi
-              </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Hedefleri ertelemene yol açan kök nedenler</p>
-            </div>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Paternler</span>
-          </div>
-
-          <div id="frictionAnalysisContainer" class="space-y-3 pt-1">
-            <!-- Dinamik doldurulacak (Yorgunluk, Zaman, Erteleme vb.) -->
-          </div>
-        </div>
-
-        <!-- Mini Pomodoro Widget Kartı -->
-        <div class="glass-card rounded-2xl p-5 border border-indigo-900/40 relative overflow-hidden">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
-              <i class="fa-solid fa-stopwatch text-indigo-400"></i> Hızlı Odaklanma
-            </span>
-            <span id="quickPomodoroStatus" class="text-[11px] font-semibold text-slate-400">Hazır</span>
-          </div>
-          
-          <div class="flex items-center justify-between">
-            <div class="text-3xl font-extrabold text-white tracking-wider font-mono" id="quickTimerDisplay">25:00</div>
-            <div class="flex items-center space-x-2">
-              <button onclick="toggleQuickTimer()" id="quickTimerBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md">
-                Başlat
-              </button>
-              <button onclick="openPomodoroModal()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs" title="Genişletilmiş Sayacı Aç">
-                <i class="fa-solid fa-expand"></i>
-              </button>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-400 mt-3">25 dakikalık odaklanma seansı bitince bağlı hedefinize otomatik eklenir.</p>
-        </div>
-
       </div>
 
+      <div class="glass-card rounded-2xl p-4 md:p-5">
+        <h3 class="text-xs md:text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+          <span>Aksama Kök Nedenleri</span>
+        </h3>
+        <div class="h-48 relative">
+          <canvas id="frictionChart"></canvas>
+        </div>
+      </div>
     </div>
 
   </main>
 
-  <!-- MODAL 1: YENİ / DÜZENLE ALIŞKANLIK -->
-  <div id="habitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="glass-card w-full max-w-lg rounded-2xl border border-slate-700/80 shadow-2xl p-6 relative transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto" id="habitModalBox">
-      <!-- Kapat Butonu -->
-      <button onclick="closeHabitModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+  <!-- MODAL: Yeni Hedef Ekle / Düzenle -->
+  <div id="habitModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-md rounded-2xl p-5 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-800 mb-4">
+        <h3 id="modalTitle" class="text-base font-bold text-white">Yeni Alışkanlık Ekle</h3>
+        <button onclick="window.closeModal('habitModal')" class="text-gray-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="habitForm" onsubmit="window.saveHabit(event)" class="space-y-4">
+        <input type="hidden" id="editHabitId">
+        
+        <div>
+          <label class="block text-xs font-medium text-gray-300 mb-1">Hedef Başlığı</label>
+          <input type="text" id="habitTitle" required placeholder="Örn: 25 Paragraf Sorusu, 2.5L Su..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Hedef Tipi</label>
+            <select id="habitType" onchange="window.toggleTypeFields()" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="boolean">Klasik (Yaptım/Yapmadım)</option>
+              <option value="numeric">Sayısal Sayaç (Litre/Sayfa vb.)</option>
+              <option value="pomodoro">Pomodoro (Odak Seansı)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Kategori</label>
+            <select id="habitCategory" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="study">Çalışma / Odak</option>
+              <option value="health">Beden & Sağlık</option>
+              <option value="mind">Zihin & Kapanış</option>
+              <option value="other">Genel Rutin</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="numericFields" class="hidden grid-cols-2 gap-3 p-3 bg-gray-800/50 rounded-xl border border-gray-700/60">
+          <div>
+            <label class="block text-[11px] text-gray-400 mb-1">Hedef Miktar</label>
+            <input type="number" id="targetValue" min="1" value="20" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+          </div>
+          <div>
+            <label class="block text-[11px] text-gray-400 mb-1">Birim (Soru, Sayfa, L)</label>
+            <input type="text" id="targetUnit" placeholder="Soru" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="window.closeModal('habitModal')" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 transition">Vazgeç</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Odak Sayacı (Pomodoro) -->
+  <div id="timerModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl relative">
+      <button onclick="window.closeModal('timerModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
 
-      <div class="flex items-center space-x-3 mb-5">
-        <div id="modalIconBox" class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center">
-          <i class="fa-solid fa-plus text-base"></i>
-        </div>
-        <div>
-          <h3 id="modalTitle" class="text-lg font-bold text-white">Yeni Alışkanlık Ekle</h3>
-          <p class="text-xs text-slate-400">Hedef tipini belirleyin ve takip etmeye başlayın.</p>
-        </div>
+      <div class="w-12 h-12 mx-auto rounded-full bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 flex items-center justify-center mb-3">
+        <i class="fa-solid fa-stopwatch text-xl"></i>
       </div>
+      <h3 class="text-base font-bold text-white">Hızlı Odaklanma</h3>
+      <p class="text-xs text-gray-400 mt-1 mb-5">25 dakikalık derin odaklanma seansı</p>
 
-      <form id="habitForm" onsubmit="handleHabitSubmit(event)" class="space-y-4">
-        <input type="hidden" id="habitId" value="">
+      <div class="text-5xl font-mono font-bold text-white tracking-widest my-4" id="timerDisplay">25:00</div>
 
-        <!-- Başlık -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Alışkanlık / Hedef Adı</label>
-          <input type="text" id="habitName" required placeholder="Örn: Su Tüketimi, Kitap Okuma, Derin Çalışma..." 
-            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-        </div>
+      <div class="flex items-center justify-center gap-3 mt-6">
+        <button id="timerToggleBtn" onclick="window.toggleTimer()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white shadow-lg transition">Başlat</button>
+        <button onclick="window.resetTimer()" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 transition">Sıfırla</button>
+      </div>
+    </div>
+  </div>
 
-        <!-- Hedef Tipi Seçimi (Klasik, Sayısal, Zamanlayıcı) -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Hedef Türü</label>
-          <div class="grid grid-cols-3 gap-2">
-            <label class="cursor-pointer">
-              <input type="radio" name="habitType" value="boolean" class="peer sr-only" checked onchange="toggleTypeFields('boolean')">
-              <div class="p-2.5 text-center rounded-xl border border-slate-700 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-indigo-300 text-xs font-semibold text-slate-400 transition-all">
-                <i class="fa-solid fa-check-circle block text-base mb-1"></i>
-                Klasik (Evet/Hayır)
+  <!-- MODAL: Veri Yönetimi -->
+  <div id="dataModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-sm rounded-2xl p-5 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-800 mb-4">
+        <h3 class="text-sm font-bold text-white">Veri Yönetimi</h3>
+        <button onclick="window.closeModal('dataModal')" class="text-gray-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <button onclick="window.exportData()" class="w-full py-2.5 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-medium text-gray-200 border border-gray-700 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-download text-indigo-400"></i>
+          <span>Verileri İndir (JSON Yedeği)</span>
+        </button>
+        <label class="w-full py-2.5 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-medium text-gray-200 border border-gray-700 flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-upload text-emerald-400"></i>
+          <span>Yedeği Geri Yükle</span>
+          <input type="file" accept=".json" onchange="window.importData(event)" class="hidden">
+        </label>
+        <button onclick="window.resetAllData()" class="w-full py-2.5 px-4 rounded-xl bg-rose-950/40 hover:bg-rose-900/50 text-xs font-medium text-rose-400 border border-rose-800/40 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>Tüm Verileri Temizle</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT ÇEKİRDEĞİ -->
+  <script>
+    // Güvenli State Başlatma
+    const STORAGE_KEY = "rutinflow_clean_v1";
+    let state = {
+      habits: [],
+      freezesLeft: 2,
+      lastFreezeWeek: getWeekNumber(new Date()),
+      frictionReasons: { "Yorgunluk": 0, "Zaman": 0, "Erteleme": 0, "Dış Etken": 0 }
+    };
+
+    function getTodayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getWeekNumber(d) {
+      const target = new Date(d.valueOf());
+      const dayNr = (d.getDay() + 6) % 7;
+      target.setDate(target.getDate() - dayNr + 3);
+      const firstThursday = target.valueOf();
+      target.setMonth(0, 1);
+      if (target.getDay() !== 4) {
+        target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+      }
+      return 1 + Math.ceil((firstThursday - target) / 604800000);
+    }
+
+    // Veri Yükleme & Kaydetme
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state.habits = Array.isArray(parsed.habits) ? parsed.habits : [];
+          state.freezesLeft = typeof parsed.freezesLeft === 'number' ? parsed.freezesLeft : 2;
+          state.frictionReasons = parsed.frictionReasons || state.frictionReasons;
+        }
+      } catch (e) {
+        console.error("Depolama okuma hatası:", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error("Depolama yazma hatası:", e);
+      }
+      renderUI();
+    }
+
+    // Modal Yönetimi
+    window.openModal = function(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+    };
+
+    window.closeModal = function(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    };
+
+    window.openAddModal = function() {
+      document.getElementById('editHabitId').value = '';
+      document.getElementById('habitTitle').value = '';
+      document.getElementById('habitType').value = 'boolean';
+      document.getElementById('habitCategory').value = 'study';
+      window.toggleTypeFields();
+      document.getElementById('modalTitle').textContent = 'Yeni Hedef Ekle';
+      window.openModal('habitModal');
+    };
+
+    window.openTimerModal = function() {
+      window.openModal('timerModal');
+    };
+
+    window.openDataModal = function() {
+      window.openModal('dataModal');
+    };
+
+    window.toggleTypeFields = function() {
+      const type = document.getElementById('habitType').value;
+      const numFields = document.getElementById('numericFields');
+      if (type === 'numeric') {
+        numFields.classList.remove('hidden');
+        numFields.classList.add('grid');
+      } else {
+        numFields.classList.add('hidden');
+        numFields.classList.remove('grid');
+      }
+    };
+
+    // Alışkanlık Kaydetme
+    window.saveHabit = function(e) {
+      e.preventDefault();
+      const id = document.getElementById('editHabitId').value;
+      const title = document.getElementById('habitTitle').value.trim();
+      const type = document.getElementById('habitType').value;
+      const category = document.getElementById('habitCategory').value;
+      const targetVal = parseFloat(document.getElementById('targetValue').value) || 1;
+      const targetUnit = document.getElementById('targetUnit').value.trim() || 'Adet';
+
+      if (!title) return;
+
+      if (id) {
+        const item = state.habits.find(h => h.id === id);
+        if (item) {
+          item.title = title;
+          item.type = type;
+          item.category = category;
+          item.targetValue = targetVal;
+          item.targetUnit = targetUnit;
+        }
+      } else {
+        state.habits.push({
+          id: 'h_' + Date.now(),
+          title,
+          type,
+          category,
+          targetValue: targetVal,
+          targetUnit: targetUnit,
+          logs: {}
+        });
+      }
+
+      window.closeModal('habitModal');
+      saveState();
+    };
+
+    window.deleteHabit = function(id) {
+      state.habits = state.habits.filter(h => h.id !== id);
+      saveState();
+    };
+
+    // Günlük Tıklama & Durum Değiştirme
+    window.toggleDay = function(habitId, dateStr) {
+      const habit = state.habits.find(h => h.id === habitId);
+      if (!habit) return;
+
+      if (!habit.logs) habit.logs = {};
+      const current = habit.logs[dateStr];
+
+      if (habit.type === 'boolean') {
+        habit.logs[dateStr] = current ? null : { completed: true, val: 1 };
+      } else if (habit.type === 'numeric') {
+        const curVal = current ? current.val : 0;
+        const nextVal = curVal >= habit.targetValue ? 0 : curVal + (habit.targetValue / 4);
+        habit.logs[dateStr] = nextVal > 0 ? { completed: nextVal >= habit.targetValue, val: nextVal } : null;
+      } else if (habit.type === 'pomodoro') {
+        habit.logs[dateStr] = current ? null : { completed: true, val: 1 };
+      }
+
+      saveState();
+    };
+
+    // UI Render İşlemleri
+    function renderUI() {
+      renderHabitsList();
+      renderStats();
+      renderHeatmap();
+      renderChartsSafe();
+    }
+
+    function renderHabitsList() {
+      const container = document.getElementById('habitsContainer');
+      document.getElementById('habit-count-badge').textContent = state.habits.length;
+
+      if (state.habits.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center border-dashed border-gray-700">
+            <div class="w-12 h-12 mx-auto rounded-full bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-compass-drafting text-xl"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white mb-1">Henüz Bir Hedef Eklenmedi</h3>
+            <p class="text-xs text-gray-400 mb-4">Takip etmek istediğin ilk 1-3 hedefi belirleyip başla.</p>
+            <button onclick="window.openAddModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-lg transition">
+              + İlk Hedefini Ekle
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const today = getTodayStr();
+      const last7Days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        last7Days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+      }
+
+      container.innerHTML = state.habits.map(h => {
+        const todayLog = (h.logs && h.logs[today]) || null;
+        const isDone = todayLog && todayLog.completed;
+
+        const dayButtons = last7Days.map(dStr => {
+          const log = (h.logs && h.logs[dStr]) || null;
+          const done = log && log.completed;
+          const isCurrent = dStr === today;
+          return `
+            <button onclick="window.toggleDay('${h.id}', '${dStr}')" class="w-7 h-7 rounded-lg text-[10px] font-bold flex items-center justify-center transition border ${
+              done 
+                ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-400 shadow-sm shadow-emerald-500/20' 
+                : 'bg-gray-800/80 border-gray-700 text-gray-500 hover:border-gray-500'
+            } ${isCurrent ? 'ring-2 ring-indigo-500/50' : ''}">
+              ${done ? '<i class="fa-solid fa-check"></i>' : dStr.split('-')[2]}
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div class="glass-card glass-card-hover rounded-2xl p-4 transition flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <button onclick="window.toggleDay('${h.id}', '${today}')" class="w-10 h-10 rounded-xl flex items-center justify-center transition border ${
+                isDone 
+                  ? 'bg-emerald-500 border-emerald-400 text-gray-950 shadow-md shadow-emerald-500/30' 
+                  : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-indigo-500'
+              }">
+                <i class="fa-solid ${isDone ? 'fa-check text-base font-bold' : 'fa-circle text-xs'}"></i>
+              </button>
+              <div>
+                <h4 class="text-sm font-semibold text-white ${isDone ? 'line-through text-gray-400' : ''}">${h.title}</h4>
+                <div class="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
+                  <span class="capitalize px-1.5 py-0.2 rounded bg-gray-800 border border-gray-700">${h.category}</span>
+                  ${h.type === 'numeric' ? `<span>Hedef: ${h.targetValue} ${h.targetUnit}</span>` : ''}
+                </div>
               </div>
-            </label>
-     
+            </div>
+
+            <div class="flex items-center justify-between md:justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-gray-800/60">
+              <div class="flex items-center gap-1.5">${dayButtons}</div>
+              <button onclick="window.deleteHabit('${h.id}')" class="text-gray-500 hover:text-rose-400 p-1.5 transition ml-1" title="Hedefi Sil">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStats() {
+      const today = getTodayStr();
+      const total = state.habits.length;
+      let completedCount = 0;
+
+      state.habits.forEach(h => {
+        if (h.logs && h.logs[today] && h.logs[today].completed) completedCount++;
+      });
+
+      const pct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+      document.getElementById('stat-today-ratio').textContent = `${completedCount} / ${total}`;
+      document.getElementById('stat-today-pct').textContent = `%${pct}`;
+      document.getElementById('stat-freeze-val').textContent = `${state.freezesLeft} / 2 Hak`;
+      document.getElementById('streak-freeze-badge').innerHTML = `<i class="fa-solid fa-snowflake text-[10px]"></i> ${state.freezesLeft}/2 Kalkan`;
+
+      // Haftalık Ortalama
+      let weeklyTotalRates = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        let done = 0;
+        state.habits.forEach(h => {
+          if (h.logs && h.logs[dStr] && h.logs[dStr].completed) done++;
+        });
+        weeklyTotalRates += total === 0 ? 0 : (done / total);
+      }
+      const weeklyAvg = Math.round((weeklyTotalRates / 7) * 100);
+      document.getElementById('stat-weekly-avg').textContent = `%${weeklyAvg}`;
+    }
+
+    function renderHeatmap() {
+      const grid = document.getElementById('heatmapGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const total = state.habits.length;
+      const days = [];
+      for (let i = 89; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+      }
+
+      // 7 satırlık dikey sütunlar halinde 90 gün
+      for (let col = 0; col < Math.ceil(days.length / 7); col++) {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'flex flex-col gap-1';
+
+        for (let row = 0; row < 7; row++) {
+          const idx = col * 7 + row;
+          if (idx >= days.length) break;
+          const dStr = days[idx];
+          let done = 0;
+          state.habits.forEach(h => {
+            if (h.logs && h.logs[dStr] && h.logs[dStr].completed) done++;
+          });
+          const rate = total === 0 ? 0 : (done / total);
+
+          let bg = 'bg-gray-800/60';
+          if (rate > 0.75) bg = 'bg-emerald-400';
+          else if (rate > 0.4) bg = 'bg-emerald-600';
+          else if (rate > 0) bg = 'bg-emerald-950 border border-emerald-800/40';
+
+          const cell = document.createElement('div');
+          cell.className = `w-2.5 h-2.5 rounded-sm ${bg}`;
+          cell.title = `${dStr}: %${Math.round(rate * 100)}`;
+          colDiv.appendChild(cell);
+        }
+        grid.appendChild(colDiv);
+      }
+    }
+
+    // Güvenli Grafik Çizimi (Chart.js yoksa veya hata verirse çökmez)
+    let weeklyChartInstance = null;
+    let frictionChartInstance = null;
+
+    function renderChartsSafe() {
+      if (typeof Chart === 'undefined') {
+        console.warn("Chart.js henüz yüklenemedi veya internet yavaş.");
+        return;
+      }
+
+      try {
+        // Haftalık Eğri
+        const labels = [];
+        const data = [];
+        const total = state.habits.length;
+
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          labels.push(d.toLocaleDateString('tr-TR', { weekday: 'short' }));
+
+          let done = 0;
+          state.habits.forEach(h => {
+            if (h.logs && h.logs[dStr] && h.logs[dStr].completed) done++;
+          });
+          data.push(total === 0 ? 0 : Math.round((done / total) * 100));
+        }
+
+        const ctx1 = document.getElementById('weeklyChart');
+        if (ctx1) {
+          if (weeklyChartInstance) weeklyChartInstance.destroy();
+          weeklyChartInstance = new Chart(ctx1, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                data,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280', font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }
+              }
+            }
+          });
+        }
+
+        // Kök Neden Analizi
+        const ctx2 = document.getElementById('frictionChart');
+        if (ctx2) {
+          if (frictionChartInstance) frictionChartInstance.destroy();
+          frictionChartInstance = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+              labels: ['Yorgunluk', 'Zaman', 'Erteleme', 'Dış Etken'],
+              datasets: [{
+                data: [35, 25, 25, 15],
+                backgroundColor: ['#f43f5e', '#f59e0b', '#8b5cf6', '#64748b'],
+                borderWidth: 0
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 10, font: { size: 9 } } } }
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Grafik oluşturma atlandı:", err);
+      }
+    }
+
+    // Pomodoro Sayacı
+    let timerInterval = null;
+    let timerSeconds = 25 * 60;
+    let isRunning = false;
+
+    window.toggleTimer = function() {
+      const btn = document.getElementById('timerToggleBtn');
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        btn.textContent = 'Devam Et';
+      } else {
+        isRunning = true;
+        btn.textContent = 'Durdur';
+        timerInterval = setInterval(() => {
+          timerSeconds--;
+          if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            btn.textContent = 'Başlat';
+            timerSeconds = 25 * 60;
+            alert('Odaklanma seansı tamamlandı!');
+          }
+          const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+          const s = String(timerSeconds % 60).padStart(2, '0');
+          document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+        }, 1000);
+      }
+    };
+
+    window.resetTimer = function() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      timerSeconds = 25 * 60;
+      document.getElementById('timerDisplay').textContent = '25:00';
+      document.getElementById('timerToggleBtn').textContent = 'Başlat';
+    };
+
+    // Veri Yedekleme
+    window.exportData = function() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rutinflow_yedek_${getTodayStr()}.json`;
+      a.click();
+    };
+
+    window.importData = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && Array.isArray(parsed.habits)) {
+            state = parsed;
+            saveState();
+            window.closeModal('dataModal');
+          }
+        } catch (err) {
+          alert('Geçersiz dosya formatı.');
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    window.resetAllData = function() {
+      if (confirm('Tüm kayıtlar silinsin mi?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        state = { habits: [], freezesLeft: 2, lastFreezeWeek: getWeekNumber(new Date()), frictionReasons: {} };
+        renderUI();
+        window.closeModal('dataModal');
+      }
+    };
+
+    // Açılış
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderUI();
+      const statusPill = document.getElementById('status-pill');
+      if (statusPill) statusPill.textContent = 'Aktif';
+    });
+  </script>
+</body>
+</html>
