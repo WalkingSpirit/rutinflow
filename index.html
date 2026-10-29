@@ -4,13 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>RutinFlow Pro</title>
-  <!-- Tailwind CSS -->
+
+  <!-- PWA & Mobil Uyumluluk -->
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"RutinFlow Pro","short_name":"RutinFlow","start_url":".","display":"standalone","background_color":"#0b0f19","theme_color":"#0b0f19","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3588/3588658.png","sizes":"512x512","type":"image/png"}]}'>
+
+  <!-- CDN Kütüphaneleri -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <style>
@@ -34,7 +38,7 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="min-h-screen pb-12 select-none">
+<body class="min-h-screen pb-14 select-none">
 
   <!-- Üst Bar -->
   <header class="glass-card sticky top-0 z-40 border-b border-gray-800/80 px-4 py-3 mb-5">
@@ -134,20 +138,24 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-calendar-days text-indigo-400 text-xs"></i>
-          <h2 class="text-xs md:text-sm font-bold text-white">90 Günlük Tutarlılık Haritası</h2>
+          <h2 class="text-xs md:text-sm font-bold text-white">90 Günlük Tutarlılık & Ruh Hali</h2>
         </div>
         <div class="flex items-center gap-1 text-[9px] text-gray-400">
           <span>Az</span>
-          <span class="w-2 h-2 rounded-xs bg-gray-800"></span>
-          <span class="w-2 h-2 rounded-xs bg-emerald-950"></span>
-          <span class="w-2 h-2 rounded-xs bg-emerald-600"></span>
-          <span class="w-2 h-2 rounded-xs bg-emerald-400"></span>
+          <span class="w-2.5 h-2.5 rounded-xs bg-gray-800"></span>
+          <span class="w-2.5 h-2.5 rounded-xs bg-emerald-950"></span>
+          <span class="w-2.5 h-2.5 rounded-xs bg-emerald-600"></span>
+          <span class="w-2.5 h-2.5 rounded-xs bg-emerald-400"></span>
           <span>Çok</span>
         </div>
       </div>
       <div class="overflow-x-auto no-scrollbar pb-1">
         <div id="heatmapGrid" class="flex gap-1 min-w-[540px]"></div>
       </div>
+      <p class="text-[10px] text-gray-500 mt-2.5 flex items-center gap-1">
+        <i class="fa-solid fa-circle-info text-indigo-400"></i>
+        <span>Kutulara dokunarak o güne mikro not ve ruh hali emojisi ekleyebilirsin.</span>
+      </p>
     </div>
 
     <!-- Alışkanlıklar Listesi Bölümü -->
@@ -157,7 +165,7 @@
           <h2 class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Hedeflerim & Rutinler</h2>
           <span id="habit-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-indigo-400 border border-gray-700">0</span>
         </div>
-        <span class="text-[11px] text-gray-500">Son 7 Günlük Takip</span>
+        <span class="text-[11px] text-gray-500">Düzenleme: Yalnızca Bugün & Dün</span>
       </div>
 
       <div id="habitsContainer" class="space-y-3"></div>
@@ -191,6 +199,7 @@
         <div class="h-44 relative">
           <canvas id="frictionChart"></canvas>
         </div>
+        <p id="todayFrictionStatus" class="text-[10px] text-gray-400 text-center mt-2 truncate">Bugün henüz aksama girilmedi.</p>
       </div>
     </div>
 
@@ -211,7 +220,7 @@
         
         <div>
           <label class="block text-[11px] font-medium text-gray-300 mb-1">Hedef Başlığı</label>
-          <input type="text" id="habitTitle" required placeholder="Örn: 25 Paragraf Sorusu, 2.5L Su, Kitap..." class="w-full bg-gray-800/90 border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-indigo-500">
+          <input type="text" id="habitTitle" required placeholder="Örn: 2.5L Su, 50 Sayfa Kitap, Yürüyüş..." class="w-full bg-gray-800/90 border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
@@ -219,7 +228,7 @@
             <label class="block text-[11px] font-medium text-gray-300 mb-1">Hedef Tipi</label>
             <select id="habitType" onchange="window.toggleTypeFields()" class="w-full bg-gray-800/90 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
               <option value="boolean">Klasik (Yaptım/Yapmadım)</option>
-              <option value="numeric">Sayısal Sayaç (Miktar Bazlı)</option>
+              <option value="numeric">Sayısal Sayaç (Litre/Sayfa vb.)</option>
             </select>
           </div>
           <div>
@@ -235,12 +244,12 @@
 
         <div id="numericFields" class="hidden grid-cols-2 gap-2.5 p-3 bg-gray-800/50 rounded-xl border border-gray-700/60">
           <div>
-            <label class="block text-[10px] text-gray-400 mb-1">Hedef Miktar</label>
-            <input type="number" id="targetValue" min="1" value="25" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <label class="block text-[10px] text-gray-400 mb-1">Hedef Miktar (Küsürlü olabilir)</label>
+            <input type="number" step="0.1" id="targetValue" min="0.1" value="2.5" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
           </div>
           <div>
-            <label class="block text-[10px] text-gray-400 mb-1">Birim (Soru, L, Sayfa)</label>
-            <input type="text" id="targetUnit" placeholder="Soru" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <label class="block text-[10px] text-gray-400 mb-1">Birim (Litre, Sayfa, Km)</label>
+            <input type="text" id="targetUnit" placeholder="Litre" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
           </div>
         </div>
 
@@ -252,32 +261,94 @@
     </div>
   </div>
 
-  <!-- MODAL: Aksama Nedeni Bildir -->
+  <!-- MODAL: Sayısal Miktar Gir (Küsürat Girişi) -->
+  <div id="numericLogModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+        <h3 id="numericLogTitle" class="text-xs font-bold text-white">İlerleme Girişi</h3>
+        <button onclick="window.closeModal('numericLogModal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p id="numericLogSub" class="text-[11px] text-gray-400"></p>
+
+      <form onsubmit="window.saveNumericLog(event)" class="space-y-3">
+        <input type="hidden" id="numHabitId">
+        <input type="hidden" id="numHabitDate">
+        <div>
+          <label class="block text-[10px] text-gray-400 mb-1">Girilen Değer</label>
+          <input type="number" step="0.05" id="numValInput" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 pt-1">
+          <button type="button" onclick="window.quickAddNum(0.25)" class="py-1.5 rounded-lg bg-gray-800 text-[10px] text-gray-300 border border-gray-700">+0.25</button>
+          <button type="button" onclick="window.quickAddNum(0.5)" class="py-1.5 rounded-lg bg-gray-800 text-[10px] text-gray-300 border border-gray-700">+0.5</button>
+          <button type="button" onclick="window.quickAddNum(1.0)" class="py-1.5 rounded-lg bg-gray-800 text-[10px] text-gray-300 border border-gray-700">+1.0</button>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="window.resetNumHabit()" class="px-3 py-2 rounded-xl bg-rose-950/40 text-rose-400 border border-rose-900/40 text-xs">Sıfırla</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Gün Detayı & Ruh Hali (Heatmap Modal) -->
+  <div id="dayDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+        <div>
+          <h3 id="dayDetailDate" class="text-sm font-bold text-white">Tarih</h3>
+          <p id="dayDetailSummary" class="text-[11px] text-indigo-400 mt-0.5">0/0 Hedef Tamamlandı</p>
+        </div>
+        <button onclick="window.closeModal('dayDetailModal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-medium text-gray-300 mb-2">Günün Ruh Hali</label>
+        <div class="grid grid-cols-4 gap-2 text-center" id="moodPickerContainer">
+          <button type="button" onclick="window.selectMood('🔥')" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xl border border-gray-700 transition" data-mood="🔥">🔥</button>
+          <button type="button" onclick="window.selectMood('😊')" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xl border border-gray-700 transition" data-mood="😊">😊</button>
+          <button type="button" onclick="window.selectMood('🥱')" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xl border border-gray-700 transition" data-mood="🥱">🥱</button>
+          <button type="button" onclick="window.selectMood('🤯')" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xl border border-gray-700 transition" data-mood="🤯">🤯</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-medium text-gray-300 mb-1">Günün Mikro Notu</label>
+        <textarea id="dayNoteInput" rows="2" placeholder="Güne dair kısa bir his, aksaklık veya zafer..." class="w-full bg-gray-800/90 border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" onclick="window.closeModal('dayDetailModal')" class="px-4 py-2 rounded-xl bg-gray-800 text-xs text-gray-300">Kapat</button>
+        <button type="button" onclick="window.saveDayNote()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Aksama Nedeni Bildir (Günde 1 Defa) -->
   <div id="frictionModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-gray-800">
         <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
           <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
-          <span>Aksama Nedeni Kaydet</span>
+          <span>Günün Aksama Nedeni</span>
         </h3>
         <button onclick="window.closeModal('frictionModal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p class="text-[11px] text-gray-400">Bugün hedeflerini tamamlamana ne engel oldu?</p>
+      <p class="text-[11px] text-gray-400">Günde yalnızca 1 temel aksama nedeni seçebilir veya güncelleyebilirsin.</p>
       
       <div class="grid grid-cols-1 gap-2">
-        <button onclick="window.recordFriction('Yorgunluk')" class="py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition">
+        <button onclick="window.recordFriction('Yorgunluk')" class="friction-opt-btn py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition" data-reason="Yorgunluk">
           <span>Yorgunluk / Enerji Düşüklüğü</span>
           <i class="fa-solid fa-battery-quarter text-rose-400"></i>
         </button>
-        <button onclick="window.recordFriction('Zaman')" class="py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition">
+        <button onclick="window.recordFriction('Zaman')" class="friction-opt-btn py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition" data-reason="Zaman">
           <span>Zaman Yetmedi / Yoğunluk</span>
           <i class="fa-solid fa-clock text-amber-400"></i>
         </button>
-        <button onclick="window.recordFriction('Erteleme')" class="py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition">
+        <button onclick="window.recordFriction('Erteleme')" class="friction-opt-btn py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition" data-reason="Erteleme">
           <span>Erteleme / İsteksizlik</span>
           <i class="fa-solid fa-couch text-purple-400"></i>
         </button>
-        <button onclick="window.recordFriction('Dış Etken')" class="py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition">
+        <button onclick="window.recordFriction('Dış Etken')" class="friction-opt-btn py-2.5 px-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-xs font-medium text-left text-gray-200 border border-gray-700 flex items-center justify-between transition" data-reason="Dış Etken">
           <span>Beklenmedik Dış Etken</span>
           <i class="fa-solid fa-cloud-bolt text-slate-400"></i>
         </button>
@@ -285,7 +356,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Odak Sayacı -->
+  <!-- MODAL: Gelişmiş Odak Sayacı (Presets + Custom) -->
   <div id="timerModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl relative">
       <button onclick="window.closeModal('timerModal')" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-gray-800 text-gray-400 hover:text-white flex items-center justify-center">
@@ -296,11 +367,24 @@
         <i class="fa-solid fa-stopwatch text-xl"></i>
       </div>
       <h3 class="text-sm font-bold text-white">Derin Odaklanma</h3>
-      <p class="text-[11px] text-gray-400 mt-0.5 mb-5">25 dakika odaklan, 5 dakika mola ver</p>
+      
+      <!-- Hazır Ayarlar (Presets) -->
+      <div class="grid grid-cols-3 gap-1.5 mt-3 mb-2">
+        <button onclick="window.setTimerMinutes(15)" class="py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-[11px] font-semibold text-gray-300 border border-gray-700 transition">15 dk</button>
+        <button onclick="window.setTimerMinutes(25)" class="py-1.5 rounded-lg bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 text-[11px] font-bold transition">25 dk</button>
+        <button onclick="window.setTimerMinutes(50)" class="py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-[11px] font-semibold text-gray-300 border border-gray-700 transition">50 dk</button>
+      </div>
 
-      <div class="text-5xl font-mono font-black text-white tracking-widest my-4" id="timerDisplay">25:00</div>
+      <!-- Serbest Dakika Girişi -->
+      <div class="flex items-center justify-center gap-2 mb-3">
+        <span class="text-[10px] text-gray-400">Özel:</span>
+        <input type="number" id="customTimerMin" min="1" max="180" placeholder="30" class="w-14 bg-gray-800 border border-gray-700 rounded-lg px-2 py-0.5 text-xs text-center text-white">
+        <button onclick="window.applyCustomTimer()" class="px-2 py-0.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-[10px] text-gray-300 border border-gray-700">Ayarla</button>
+      </div>
 
-      <div class="grid grid-cols-2 gap-2 mt-5">
+      <div class="text-5xl font-mono font-black text-white tracking-widest my-3" id="timerDisplay">25:00</div>
+
+      <div class="grid grid-cols-2 gap-2 mt-4">
         <button id="timerToggleBtn" onclick="window.toggleTimer()" class="py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg transition active:scale-95">Başlat</button>
         <button onclick="window.resetTimer()" class="py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 transition active:scale-95">Sıfırla</button>
       </div>
@@ -332,12 +416,13 @@
 
   <!-- JAVASCRIPT ÇEKİRDEĞİ -->
   <script>
-    const STORAGE_KEY = "rutinflow_dashboard_v3";
+    const STORAGE_KEY = "rutinflow_dashboard_v4";
     let state = {
       habits: [],
       freezesLeft: 2,
       lastFreezeWeek: null,
-      frictionReasons: { "Yorgunluk": 1, "Zaman": 1, "Erteleme": 1, "Dış Etken": 0 }
+      frictionHistory: {}, // { "YYYY-MM-DD": "Yorgunluk" } - Günde tek kayıt
+      dayNotes: {}         // { "YYYY-MM-DD": { mood: "🔥", note: "..." } }
     };
 
     function escapeHTML(str) {
@@ -354,6 +439,19 @@
     function getTodayStr() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getYesterdayStr() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // Anti-Cheat: Sadece Bugün ve Dün işaretlenebilir. Gelecek ve 2 günden eski tarihler kilitli
+    function isDateEditable(dateStr) {
+      const today = getTodayStr();
+      const yesterday = getYesterdayStr();
+      return dateStr === today || dateStr === yesterday;
     }
 
     function getWeekNumber(date = new Date()) {
@@ -381,7 +479,8 @@
           state.habits = Array.isArray(parsed.habits) ? parsed.habits : [];
           state.freezesLeft = typeof parsed.freezesLeft === 'number' ? parsed.freezesLeft : 2;
           state.lastFreezeWeek = parsed.lastFreezeWeek || null;
-          state.frictionReasons = parsed.frictionReasons || { "Yorgunluk": 1, "Zaman": 1, "Erteleme": 1, "Dış Etken": 0 };
+          state.frictionHistory = parsed.frictionHistory || {};
+          state.dayNotes = parsed.dayNotes || {};
         }
       } catch (e) {
         console.error("Yükleme hatası:", e);
@@ -398,7 +497,7 @@
       if (reRender) renderUI();
     }
 
-    // Modal Yönetimi
+    // Modal Fonksiyonları
     window.openModal = function(id) {
       const el = document.getElementById(id);
       if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
@@ -415,8 +514,8 @@
       document.getElementById('habitTitle').value = '';
       document.getElementById('habitType').value = 'boolean';
       document.getElementById('habitCategory').value = 'study';
-      document.getElementById('targetValue').value = '25';
-      document.getElementById('targetUnit').value = 'Soru';
+      document.getElementById('targetValue').value = '2.5';
+      document.getElementById('targetUnit').value = 'Litre';
       window.toggleTypeFields();
       window.openModal('habitModal');
     };
@@ -430,15 +529,32 @@
       document.getElementById('habitTitle').value = habit.title;
       document.getElementById('habitType').value = habit.type;
       document.getElementById('habitCategory').value = habit.category;
-      document.getElementById('targetValue').value = habit.targetValue || 25;
-      document.getElementById('targetUnit').value = habit.targetUnit || 'Soru';
+      document.getElementById('targetValue').value = habit.targetValue || 1;
+      document.getElementById('targetUnit').value = habit.targetUnit || 'Adet';
       window.toggleTypeFields();
       window.openModal('habitModal');
     };
 
-    window.openTimerModal = function() { window.openModal('timerModal'); };
+    window.openTimerModal = function() { 
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+      window.openModal('timerModal'); 
+    };
+
     window.openDataModal = function() { window.openModal('dataModal'); };
-    window.openFrictionModal = function() { window.openModal('frictionModal'); };
+    window.openFrictionModal = function() {
+      const today = getTodayStr();
+      const current = state.frictionHistory[today];
+      document.querySelectorAll('.friction-opt-btn').forEach(btn => {
+        if (btn.dataset.reason === current) {
+          btn.classList.add('ring-1.5', 'ring-rose-500', 'bg-rose-950/20');
+        } else {
+          btn.classList.remove('ring-1.5', 'ring-rose-500', 'bg-rose-950/20');
+        }
+      });
+      window.openModal('frictionModal');
+    };
 
     window.toggleTypeFields = function() {
       const type = document.getElementById('habitType').value;
@@ -458,7 +574,7 @@
       const title = document.getElementById('habitTitle').value.trim();
       const type = document.getElementById('habitType').value;
       const category = document.getElementById('habitCategory').value;
-      const targetVal = parseFloat(document.getElementById('targetValue').value) || 20;
+      const targetVal = parseFloat(document.getElementById('targetValue').value) || 1;
       const targetUnit = document.getElementById('targetUnit').value.trim() || 'Adet';
 
       if (!title) return;
@@ -499,7 +615,13 @@
       }
     };
 
+    // Alışkanlık Tikleme (Anti-Cheat & Küsürat Desteği)
     window.toggleDay = function(habitId, dateStr) {
+      if (!isDateEditable(dateStr)) {
+        alert("Anti-Hile: Yalnızca 'Bugün' ve 'Dün' için kayıt girebilir veya değiştirebilirsin.");
+        return;
+      }
+
       const habit = state.habits.find(h => h.id === habitId);
       if (!habit) return;
       if (!habit.logs) habit.logs = {};
@@ -507,21 +629,122 @@
 
       if (habit.type === 'boolean') {
         habit.logs[dateStr] = current && current.completed ? null : { completed: true, val: 1 };
+        saveState();
       } else {
-        const curVal = current ? (current.val || 0) : 0;
-        const step = Math.max(1, Math.round(habit.targetValue / 4));
-        const nextVal = curVal >= habit.targetValue ? 0 : Math.min(habit.targetValue, curVal + step);
-        habit.logs[dateStr] = nextVal > 0 ? { completed: nextVal >= habit.targetValue, val: nextVal } : null;
+        // Sayısal hedef için küsürat modalını aç
+        window.openNumericLog(habitId, dateStr);
+      }
+    };
+
+    // Sayısal Küsürat Modalı
+    window.openNumericLog = function(habitId, dateStr) {
+      const habit = state.habits.find(h => h.id === habitId);
+      if (!habit) return;
+
+      const log = habit.logs && habit.logs[dateStr];
+      const curVal = log ? log.val : 0;
+
+      document.getElementById('numHabitId').value = habitId;
+      document.getElementById('numHabitDate').value = dateStr;
+      document.getElementById('numericLogTitle').textContent = habit.title;
+      document.getElementById('numericLogSub').textContent = `Hedef: ${habit.targetValue} ${habit.targetUnit} (${dateStr})`;
+      document.getElementById('numValInput').value = curVal;
+
+      window.openModal('numericLogModal');
+    };
+
+    window.quickAddNum = function(amount) {
+      const input = document.getElementById('numValInput');
+      const val = parseFloat(input.value) || 0;
+      input.value = (Math.round((val + amount) * 100) / 100).toFixed(2);
+    };
+
+    window.saveNumericLog = function(e) {
+      e.preventDefault();
+      const habitId = document.getElementById('numHabitId').value;
+      const dateStr = document.getElementById('numHabitDate').value;
+      const val = parseFloat(document.getElementById('numValInput').value) || 0;
+
+      const habit = state.habits.find(h => h.id === habitId);
+      if (!habit) return;
+      if (!habit.logs) habit.logs = {};
+
+      if (val <= 0) {
+        habit.logs[dateStr] = null;
+      } else {
+        habit.logs[dateStr] = {
+          completed: val >= habit.targetValue,
+          val: Math.round(val * 100) / 100
+        };
       }
 
+      window.closeModal('numericLogModal');
       saveState();
     };
 
+    window.resetNumHabit = function() {
+      document.getElementById('numValInput').value = 0;
+    };
+
+    // Aksama Nedeni Spam Engeli (Günde 1 Kayıt)
     window.recordFriction = function(reason) {
-      if (!state.frictionReasons[reason]) state.frictionReasons[reason] = 0;
-      state.frictionReasons[reason]++;
+      const today = getTodayStr();
+      state.frictionHistory[today] = reason;
       saveState();
       window.closeModal('frictionModal');
+    };
+
+    // Gün Detayı & Ruh Hali
+    let activeDayDetailDate = null;
+    let selectedMoodChar = null;
+
+    window.openDayDetail = function(dateStr) {
+      activeDayDetailDate = dateStr;
+      const noteObj = state.dayNotes[dateStr] || { mood: '', note: '' };
+      selectedMoodChar = noteObj.mood || '';
+
+      document.getElementById('dayDetailDate').textContent = dateStr;
+      document.getElementById('dayNoteInput').value = noteObj.note || '';
+
+      // O günkü performans özeti
+      let done = 0;
+      const total = state.habits.length;
+      state.habits.forEach(h => {
+        if (h.logs && h.logs[dateStr] && h.logs[dateStr].completed) done++;
+      });
+      document.getElementById('dayDetailSummary').textContent = `${done}/${total} Hedef Tamamlandı (%${total === 0 ? 0 : Math.round((done / total) * 100)})`;
+
+      window.updateMoodUI();
+      window.openModal('dayDetailModal');
+    };
+
+    window.selectMood = function(mood) {
+      selectedMoodChar = (selectedMoodChar === mood) ? '' : mood;
+      window.updateMoodUI();
+    };
+
+    window.updateMoodUI = function() {
+      document.querySelectorAll('#moodPickerContainer button').forEach(btn => {
+        if (btn.dataset.mood === selectedMoodChar) {
+          btn.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-600/30');
+        } else {
+          btn.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-600/30');
+        }
+      });
+    };
+
+    window.saveDayNote = function() {
+      if (!activeDayDetailDate) return;
+      const note = document.getElementById('dayNoteInput').value.trim();
+
+      if (!selectedMoodChar && !note) {
+        delete state.dayNotes[activeDayDetailDate];
+      } else {
+        state.dayNotes[activeDayDetailDate] = { mood: selectedMoodChar, note: note };
+      }
+
+      window.closeModal('dayDetailModal');
+      saveState();
     };
 
     function calculateStreak() {
@@ -531,10 +754,10 @@
       let checkDate = new Date();
       const today = getTodayStr();
 
-      // Bugün tüm hedefler bitti mi?
+      // Bugünün tamamı yapıldı mı?
       const isTodayCompleted = state.habits.every(h => h.logs && h.logs[today] && h.logs[today].completed);
       
-      // Bugün henüz bitmediyse streak sayımına dünden başla
+      // Bugün henüz bitmediyse dünden saymaya başla
       if (!isTodayCompleted) {
         checkDate.setDate(checkDate.getDate() - 1);
       }
@@ -549,7 +772,6 @@
           streak++;
         } else if (shieldsAvailable > 0) {
           shieldsAvailable--;
-          // Kalkan günü kurtardı, seriyi bozmadan devam ettir
         } else {
           break;
         }
@@ -564,6 +786,7 @@
       renderStats();
       renderHeatmap();
       renderChartsSafe();
+      renderFrictionStatus();
     }
 
     function renderHabitsList() {
@@ -610,12 +833,15 @@
           const log = (h.logs && h.logs[item.dateStr]) || null;
           const done = log && log.completed;
           const isToday = item.dateStr === today;
+          const editable = isDateEditable(item.dateStr);
+
           return `
-            <button onclick="window.toggleDay('${h.id}', '${item.dateStr}')" class="flex-1 py-1.5 md:py-2 rounded-xl flex flex-col items-center justify-center transition border ${
-              done 
-                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 font-bold shadow-sm shadow-emerald-500/10' 
-                : 'bg-gray-800/70 border-gray-800 text-gray-400 hover:border-gray-700'
-            } ${isToday ? 'ring-1.5 ring-indigo-500/70' : ''}">
+            <button onclick="window.toggleDay('${h.id}', '${item.dateStr}')" 
+              class="flex-1 py-1.5 md:py-2 rounded-xl flex flex-col items-center justify-center transition border ${
+                done 
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 font-bold shadow-sm shadow-emerald-500/10' 
+                  : 'bg-gray-800/70 border-gray-800 text-gray-400 hover:border-gray-700'
+              } ${isToday ? 'ring-1.5 ring-indigo-500/70' : ''} ${!editable ? 'opacity-60 cursor-not-allowed' : ''}">
               <span class="text-[8px] md:text-[9px] text-gray-400">${item.label}</span>
               <span class="text-[10px] md:text-xs font-bold mt-0.5">${done ? '<i class="fa-solid fa-check text-emerald-400"></i>' : item.dayNum}</span>
             </button>
@@ -747,12 +973,31 @@
           else if (rate > 0.4) bg = 'bg-emerald-600';
           else if (rate > 0) bg = 'bg-emerald-950 border border-emerald-800/40';
 
-          const cell = document.createElement('div');
-          cell.className = `w-2.5 h-2.5 rounded-xs ${bg}`;
-          cell.title = `${dStr}: %${Math.round(rate * 100)}`;
+          const noteData = state.dayNotes[dStr];
+          const hasNote = !!noteData;
+
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = `w-2.5 h-2.5 rounded-xs ${bg} relative transition hover:scale-125 focus:outline-none ${hasNote ? 'ring-1 ring-amber-400' : ''}`;
+          cell.title = `${dStr}: %${Math.round(rate * 100)}${noteData ? ` [${noteData.mood || ''} ${noteData.note || ''}]` : ''}`;
+          cell.onclick = () => window.openDayDetail(dStr);
+
           colDiv.appendChild(cell);
         }
         grid.appendChild(colDiv);
+      }
+    }
+
+    function renderFrictionStatus() {
+      const today = getTodayStr();
+      const reason = state.frictionHistory[today];
+      const el = document.getElementById('todayFrictionStatus');
+      if (el) {
+        if (reason) {
+          el.innerHTML = `Bugünkü Aksama: <strong class="text-rose-400">${escapeHTML(reason)}</strong>`;
+        } else {
+          el.textContent = "Bugün henüz aksama bildirilmedi.";
+        }
       }
     }
 
@@ -809,20 +1054,26 @@
           });
         }
 
+        // Aksama Nedenlerini Tarihçe üzerinden dinamik topla
+        const reasonCounts = { "Yorgunluk": 0, "Zaman": 0, "Erteleme": 0, "Dış Etken": 0 };
+        Object.values(state.frictionHistory).forEach(r => {
+          if (reasonCounts[r] !== undefined) reasonCounts[r]++;
+        });
+
         const ctx2 = document.getElementById('frictionChart');
         if (ctx2) {
           if (frictionChartInstance) frictionChartInstance.destroy();
-          const fKeys = Object.keys(state.frictionReasons);
-          const fValues = Object.values(state.frictionReasons);
-          const allZero = fValues.every(v => v === 0);
+          const fKeys = Object.keys(reasonCounts);
+          const fValues = Object.values(reasonCounts);
+          const hasAny = fValues.some(v => v > 0);
 
           frictionChartInstance = new Chart(ctx2, {
             type: 'doughnut',
             data: {
-              labels: fKeys,
+              labels: hasAny ? fKeys : ['Veri Yok'],
               datasets: [{
-                data: allZero ? [1, 1, 1, 1] : fValues,
-                backgroundColor: ['#f43f5e', '#f59e0b', '#8b5cf6', '#64748b'],
+                data: hasAny ? fValues : [1],
+                backgroundColor: hasAny ? ['#f43f5e', '#f59e0b', '#8b5cf6', '#64748b'] : ['#1f2937'],
                 borderWidth: 0
               }]
             },
@@ -838,8 +1089,9 @@
       }
     }
 
-    // Pomodoro (Sapmayan Zamanlayıcı & Web Ses Sentezi)
+    // Pomodoro (Presets + Özel Süre + Web Notification)
     let timerSeconds = 25 * 60;
+    let selectedBaseSeconds = 25 * 60;
     let isRunning = false;
     let timerEndTime = null;
     let timerRaf = null;
@@ -854,12 +1106,21 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
         osc.start();
-        osc.stop(ctx.currentTime + 0.6);
+        osc.stop(ctx.currentTime + 0.7);
       } catch (e) {
-        console.warn('AudioContext hatası:', e);
+        console.warn('AudioContext uyarısı:', e);
+      }
+    }
+
+    function sendSystemNotification() {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("RutinFlow: Odak Seansı Tamamlandı!", {
+          body: "Tebrikler! Odak seansını bitirdin. Şimdi hak ettiğin bir mola ver.",
+          icon: "https://cdn-icons-png.flaticon.com/512/3588/3588658.png"
+        });
       }
     }
 
@@ -871,6 +1132,20 @@
       document.getElementById('headerTimerText').textContent = isRunning ? formatted : 'Odak';
     }
 
+    window.setTimerMinutes = function(min) {
+      if (isRunning) window.resetTimer();
+      selectedBaseSeconds = min * 60;
+      timerSeconds = selectedBaseSeconds;
+      updateTimerUI(timerSeconds);
+    };
+
+    window.applyCustomTimer = function() {
+      const val = parseInt(document.getElementById('customTimerMin').value);
+      if (val && val > 0 && val <= 180) {
+        window.setTimerMinutes(val);
+      }
+    };
+
     window.toggleTimer = function() {
       const btn = document.getElementById('timerToggleBtn');
       if (isRunning) {
@@ -879,6 +1154,9 @@
         btn.textContent = 'Devam Et';
         document.getElementById('headerTimerText').textContent = 'Odak';
       } else {
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
         isRunning = true;
         btn.textContent = 'Durdur';
         timerEndTime = Date.now() + (timerSeconds * 1000);
@@ -892,9 +1170,10 @@
           if (left <= 0) {
             isRunning = false;
             btn.textContent = 'Başlat';
-            timerSeconds = 25 * 60;
+            timerSeconds = selectedBaseSeconds;
             updateTimerUI(timerSeconds);
             playBeep();
+            sendSystemNotification();
             if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 80 });
             return;
           }
@@ -907,13 +1186,13 @@
     window.resetTimer = function() {
       cancelAnimationFrame(timerRaf);
       isRunning = false;
-      timerSeconds = 25 * 60;
+      timerSeconds = selectedBaseSeconds;
       updateTimerUI(timerSeconds);
       document.getElementById('timerToggleBtn').textContent = 'Başlat';
       document.getElementById('headerTimerText').textContent = 'Odak';
     };
 
-    // Veri İşlemleri
+    // Veri Yönetimi
     window.exportData = function() {
       const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -946,7 +1225,8 @@
           habits: [],
           freezesLeft: 2,
           lastFreezeWeek: null,
-          frictionReasons: { "Yorgunluk": 0, "Zaman": 0, "Erteleme": 0, "Dış Etken": 0 }
+          frictionHistory: {},
+          dayNotes: {}
         };
         saveState();
         window.closeModal('dataModal');
