@@ -7,9 +7,10 @@
 
   <!-- PWA & Mobil Uyumluluk -->
   <meta name="theme-color" content="#0b0f19">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"RutinFlow Pro","short_name":"RutinFlow","start_url":".","display":"standalone","background_color":"#0b0f19","theme_color":"#0b0f19","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3588/3588658.png","sizes":"512x512","type":"image/png"}]}'>
+  <link rel="manifest" href="./manifest.json">
 
   <!-- CDN Kütüphaneleri -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -421,7 +422,7 @@
       habits: [],
       freezesLeft: 2,
       lastFreezeWeek: null,
-      frictionHistory: {}, // { "YYYY-MM-DD": "Yorgunluk" } - Günde tek kayıt
+      frictionHistory: {}, // { "YYYY-MM-DD": "Yorgunluk" }
       dayNotes: {}         // { "YYYY-MM-DD": { mood: "🔥", note: "..." } }
     };
 
@@ -447,7 +448,7 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Anti-Cheat: Sadece Bugün ve Dün işaretlenebilir. Gelecek ve 2 günden eski tarihler kilitli
+    // Anti-Cheat: Yalnızca Bugün ve Dün düzenlenebilir
     function isDateEditable(dateStr) {
       const today = getTodayStr();
       const yesterday = getYesterdayStr();
@@ -497,7 +498,7 @@
       if (reRender) renderUI();
     }
 
-    // Modal Fonksiyonları
+    // Modal Yönetimi
     window.openModal = function(id) {
       const el = document.getElementById(id);
       if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
@@ -543,6 +544,7 @@
     };
 
     window.openDataModal = function() { window.openModal('dataModal'); };
+    
     window.openFrictionModal = function() {
       const today = getTodayStr();
       const current = state.frictionHistory[today];
@@ -615,7 +617,6 @@
       }
     };
 
-    // Alışkanlık Tikleme (Anti-Cheat & Küsürat Desteği)
     window.toggleDay = function(habitId, dateStr) {
       if (!isDateEditable(dateStr)) {
         alert("Anti-Hile: Yalnızca 'Bugün' ve 'Dün' için kayıt girebilir veya değiştirebilirsin.");
@@ -631,12 +632,11 @@
         habit.logs[dateStr] = current && current.completed ? null : { completed: true, val: 1 };
         saveState();
       } else {
-        // Sayısal hedef için küsürat modalını aç
         window.openNumericLog(habitId, dateStr);
       }
     };
 
-    // Sayısal Küsürat Modalı
+    // Sayısal Modal Girişi
     window.openNumericLog = function(habitId, dateStr) {
       const habit = state.habits.find(h => h.id === habitId);
       if (!habit) return;
@@ -686,7 +686,6 @@
       document.getElementById('numValInput').value = 0;
     };
 
-    // Aksama Nedeni Spam Engeli (Günde 1 Kayıt)
     window.recordFriction = function(reason) {
       const today = getTodayStr();
       state.frictionHistory[today] = reason;
@@ -706,7 +705,6 @@
       document.getElementById('dayDetailDate').textContent = dateStr;
       document.getElementById('dayNoteInput').value = noteObj.note || '';
 
-      // O günkü performans özeti
       let done = 0;
       const total = state.habits.length;
       state.habits.forEach(h => {
@@ -754,10 +752,8 @@
       let checkDate = new Date();
       const today = getTodayStr();
 
-      // Bugünün tamamı yapıldı mı?
       const isTodayCompleted = state.habits.every(h => h.logs && h.logs[today] && h.logs[today].completed);
       
-      // Bugün henüz bitmediyse dünden saymaya başla
       if (!isTodayCompleted) {
         checkDate.setDate(checkDate.getDate() - 1);
       }
@@ -857,7 +853,6 @@
 
         return `
           <div class="glass-card glass-card-interactive rounded-2xl p-3.5 md:p-4 space-y-3 transition border border-gray-800/80">
-            <!-- Üst Bilgi Satırı -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <button onclick="window.toggleDay('${h.id}', '${today}')" class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition active:scale-90 border ${
@@ -894,7 +889,6 @@
               </div>
             ` : ''}
 
-            <!-- 7 Günlük Matris -->
             <div class="flex gap-1.5 pt-2 border-t border-gray-800/60">
               ${dayButtons}
             </div>
@@ -917,15 +911,12 @@
       document.getElementById('stat-today-pct').textContent = `%${pct}`;
       document.getElementById('stat-today-bar').style.width = `${pct}%`;
 
-      // Gerçek Streak
       const streakVal = calculateStreak();
       document.getElementById('stat-streak-val').textContent = `${streakVal} Gün`;
 
-      // Kalkan
       document.getElementById('stat-freeze-val').textContent = `${state.freezesLeft} / 2`;
       document.getElementById('streak-freeze-badge').innerHTML = `<i class="fa-solid fa-snowflake text-[10px]"></i> ${state.freezesLeft}/2 Kalkan`;
 
-      // Haftalık Ortalama
       let weeklyTotalRates = 0;
       for (let i = 0; i < 7; i++) {
         const d = new Date();
@@ -1054,7 +1045,6 @@
           });
         }
 
-        // Aksama Nedenlerini Tarihçe üzerinden dinamik topla
         const reasonCounts = { "Yorgunluk": 0, "Zaman": 0, "Erteleme": 0, "Dış Etken": 0 };
         Object.values(state.frictionHistory).forEach(r => {
           if (reasonCounts[r] !== undefined) reasonCounts[r]++;
@@ -1118,7 +1108,7 @@
     function sendSystemNotification() {
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("RutinFlow: Odak Seansı Tamamlandı!", {
-          body: "Tebrikler! Odak seansını bitirdin. Şimdi hak ettiğin bir mola ver.",
+          body: "Tebrikler! Odak seansını bitirdin. Şimdi mola vakti.",
           icon: "https://cdn-icons-png.flaticon.com/512/3588/3588658.png"
         });
       }
@@ -1232,6 +1222,15 @@
         window.closeModal('dataModal');
       }
     };
+
+    // Service Worker Kaydı (PWA WebAPK Desteği)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.log('ServiceWorker kaydı bekleniyor:', err);
+        });
+      });
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
