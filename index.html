@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>RutinFlow Pro</title>
 
-  <!-- PWA & Mobil Uyumluluk -->
+  <!-- PWA & Android Standalone Tanımları -->
   <meta name="theme-color" content="#0b0f19">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="./manifest.json">
+
+  <!-- Service Worker Başlatıcı (Gecikmesiz Kayıt) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .catch(err => console.error('SW Kayıt Hatası:', err));
+    }
+  </script>
 
   <!-- CDN Kütüphaneleri -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -134,7 +142,7 @@
       </div>
     </div>
 
-    <!-- 90 Günlük GitHub Isı Haritası -->
+    <!-- 90 Günlük GitHub Isı Haritası & Ruh Hali -->
     <div class="glass-card rounded-2xl p-3.5 md:p-5">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
@@ -155,7 +163,7 @@
       </div>
       <p class="text-[10px] text-gray-500 mt-2.5 flex items-center gap-1">
         <i class="fa-solid fa-circle-info text-indigo-400"></i>
-        <span>Kutulara dokunarak o güne mikro not ve ruh hali emojisi ekleyebilirsin.</span>
+        <span>Kutulara dokunarak o güne mikro not ve ruh hali ekleyebilirsin.</span>
       </p>
     </div>
 
@@ -200,7 +208,7 @@
         <div class="h-44 relative">
           <canvas id="frictionChart"></canvas>
         </div>
-        <p id="todayFrictionStatus" class="text-[10px] text-gray-400 text-center mt-2 truncate">Bugün henüz aksama girilmedi.</p>
+        <p id="todayFrictionStatus" class="text-[10px] text-gray-400 text-center mt-2 truncate">Bugün henüz aksama bildirilmedi.</p>
       </div>
     </div>
 
@@ -291,7 +299,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Gün Detayı & Ruh Hali (Heatmap Modal) -->
+  <!-- MODAL: Gün Detayı & Ruh Hali -->
   <div id="dayDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-gray-800">
@@ -324,7 +332,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Aksama Nedeni Bildir (Günde 1 Defa) -->
+  <!-- MODAL: Aksama Nedeni Bildir (Günde 1 Kayıt) -->
   <div id="frictionModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-gray-800">
@@ -357,7 +365,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Gelişmiş Odak Sayacı (Presets + Custom) -->
+  <!-- MODAL: Gelişmiş Odak Sayacı -->
   <div id="timerModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card bg-gray-900 border-gray-700 w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl relative">
       <button onclick="window.closeModal('timerModal')" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-gray-800 text-gray-400 hover:text-white flex items-center justify-center">
@@ -369,14 +377,14 @@
       </div>
       <h3 class="text-sm font-bold text-white">Derin Odaklanma</h3>
       
-      <!-- Hazır Ayarlar (Presets) -->
+      <!-- Presets -->
       <div class="grid grid-cols-3 gap-1.5 mt-3 mb-2">
         <button onclick="window.setTimerMinutes(15)" class="py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-[11px] font-semibold text-gray-300 border border-gray-700 transition">15 dk</button>
         <button onclick="window.setTimerMinutes(25)" class="py-1.5 rounded-lg bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 text-[11px] font-bold transition">25 dk</button>
         <button onclick="window.setTimerMinutes(50)" class="py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-[11px] font-semibold text-gray-300 border border-gray-700 transition">50 dk</button>
       </div>
 
-      <!-- Serbest Dakika Girişi -->
+      <!-- Custom Input -->
       <div class="flex items-center justify-center gap-2 mb-3">
         <span class="text-[10px] text-gray-400">Özel:</span>
         <input type="number" id="customTimerMin" min="1" max="180" placeholder="30" class="w-14 bg-gray-800 border border-gray-700 rounded-lg px-2 py-0.5 text-xs text-center text-white">
@@ -422,8 +430,8 @@
       habits: [],
       freezesLeft: 2,
       lastFreezeWeek: null,
-      frictionHistory: {}, // { "YYYY-MM-DD": "Yorgunluk" }
-      dayNotes: {}         // { "YYYY-MM-DD": { mood: "🔥", note: "..." } }
+      frictionHistory: {},
+      dayNotes: {}
     };
 
     function escapeHTML(str) {
@@ -448,7 +456,6 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Anti-Cheat: Yalnızca Bugün ve Dün düzenlenebilir
     function isDateEditable(dateStr) {
       const today = getTodayStr();
       const yesterday = getYesterdayStr();
@@ -536,13 +543,7 @@
       window.openModal('habitModal');
     };
 
-    window.openTimerModal = function() { 
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-      window.openModal('timerModal'); 
-    };
-
+    window.openTimerModal = function() { window.openModal('timerModal'); };
     window.openDataModal = function() { window.openModal('dataModal'); };
     
     window.openFrictionModal = function() {
@@ -636,7 +637,6 @@
       }
     };
 
-    // Sayısal Modal Girişi
     window.openNumericLog = function(habitId, dateStr) {
       const habit = state.habits.find(h => h.id === habitId);
       if (!habit) return;
@@ -693,7 +693,6 @@
       window.closeModal('frictionModal');
     };
 
-    // Gün Detayı & Ruh Hali
     let activeDayDetailDate = null;
     let selectedMoodChar = null;
 
@@ -1109,7 +1108,7 @@
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("RutinFlow: Odak Seansı Tamamlandı!", {
           body: "Tebrikler! Odak seansını bitirdin. Şimdi mola vakti.",
-          icon: "https://cdn-icons-png.flaticon.com/512/3588/3588658.png"
+          icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Noto_Emoji_KitKat_26a1.svg/192px-Noto_Emoji_KitKat_26a1.svg.png"
         });
       }
     }
@@ -1222,15 +1221,6 @@
         window.closeModal('dataModal');
       }
     };
-
-    // Service Worker Kaydı (PWA WebAPK Desteği)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => {
-          console.log('ServiceWorker kaydı bekleniyor:', err);
-        });
-      });
-    }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
